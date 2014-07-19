@@ -10,7 +10,7 @@ class
 
 inherit
 
-	EXCEPTIONS
+	ANY
 		redefine
 			default_create
 		end
@@ -39,10 +39,12 @@ feature {NONE} -- Initialization
 feature -- Access
 
 	value (an_object: detachable ANY): detachable JSON_VALUE
-			-- JSON value from Eiffel object. Raises an "eJSON exception" if
-			-- unable to convert value.
+			-- JSON value from Eiffel object.
+			--
+			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if no converter is registered for `an_object'.
 		local
 			ja: JSON_ARRAY
+			l_exception: EXCEPTION
 		do
 				-- Try to convert from basic Eiffel types. Note that we check with
 				-- `conforms_to' since the client may have subclassed the base class
@@ -84,15 +86,19 @@ feature -- Access
 				if attached converter_for (an_object) as jc then
 					Result := jc.to_json (an_object)
 				else
-					raise (exception_failed_to_convert_to_json (an_object))
+					create {JSON_UNREGISTERED_CONVERTER_EXCEPTION} l_exception.make (an_object.generating_type, Current)
+					l_exception.raise
 				end
 			end
 		end
 
 	object (a_value: detachable JSON_VALUE; a_type: detachable TYPE [detachable ANY]): detachable ANY
-			-- Eiffel object from JSON value. If `base_class' /= Void an eiffel
-			-- object based on `base_class' will be returned. Raises an "eJSON
-			-- exception" if unable to convert value.
+			-- Eiffel object from JSON value. If `a_type' /= Void an eiffel
+			-- object based on `a_type' will be returned.
+			--
+			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if no converter is registered for `a_type'.
+		local
+			l_exception: EXCEPTION
 		do
 			if a_value = Void then
 				Result := Void
@@ -127,7 +133,8 @@ feature -- Access
 					if attached converter_of (a_type) as l_converter then
 						Result := l_converter.from_json (a_value)
 					else
-						raise (exception_failed_to_convert_to_eiffel (a_value, a_type))
+						create {JSON_UNREGISTERED_CONVERTER_EXCEPTION} l_exception.make (a_type, Current)
+						l_exception.raise
 					end
 				end
 			end
@@ -226,28 +233,6 @@ feature {NONE} -- Implementation
 			-- Default converter for JSON_OBJECT.
 		once
 			create {JSON_HASH_TABLE_CONVERTER} Result
-		end
-
-feature {NONE} -- Implementation (Exceptions)
-
-	exception_prefix: STRING = "eJSON exception: "
-			-- Prefix for all EJSON exception.
-
-	exception_failed_to_convert_to_eiffel (a_value: JSON_VALUE; a_type: TYPE [detachable ANY]): STRING
-			-- Exception message for failing to convert a JSON_VALUE to an instance of `a_value'.
-		require
-			a_type_attached: a_type /= Void
-		do
-			Result := exception_prefix + "Failed to convert JSON_VALUE to an Eiffel object: " + a_value.generator + " -> {" + class_name_of_type (a_type.type_id) + "}"
-		end
-
-	exception_failed_to_convert_to_json (a_object: detachable ANY): STRING
-			-- Exception message for failing to convert `a_object' to a JSON_VALUE.
-		do
-			Result := exception_prefix + "Failed to convert Eiffel object to a JSON_VALUE"
-			if a_object /= Void then
-				Result.append (" : {" + a_object.generator + "}")
-			end
 		end
 
 feature {NONE} -- Implementation (JSON parser)

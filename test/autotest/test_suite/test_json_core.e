@@ -10,6 +10,15 @@ inherit
 
 	EQA_TEST_SET
 
+inherit {NONE}
+
+	EXCEPTION_MANAGER
+		export
+			{NONE} all
+		undefine
+			default_create
+		end
+
 feature -- Test
 
 	test_json_number_and_integer
@@ -802,7 +811,7 @@ feature -- Test
 				create gv
 				jv := json.value (gv)
 			else
-				assert ("exceptions.is_developer_exception", json.is_developer_exception)
+				assert ("exceptions.is_developer_exception", attached {JSON_UNREGISTERED_CONVERTER_EXCEPTION} last_exception)
 			end
 		rescue
 			exception := True
@@ -821,7 +830,7 @@ feature -- Test
 				create jo
 				gv := json.object (jo, {OPERATING_ENVIRONMENT})
 			else
-				assert ("exceptions.is_developer_exception", json.is_developer_exception)
+				assert ("exceptions.is_developer_exception", attached {JSON_UNREGISTERED_CONVERTER_EXCEPTION} last_exception)
 			end
 		rescue
 			exception := True
