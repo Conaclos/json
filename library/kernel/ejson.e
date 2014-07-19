@@ -136,6 +136,8 @@ feature -- Access
 				else
 					if attached converter_of (a_type) as l_converter then
 						Result := l_converter.from_json (a_value)
+					elseif not (a_type.is_attached or a_type.is_expanded) then
+						Result := Void
 					else
 						create {JSON_UNREGISTERED_CONVERTER_EXCEPTION} l_exception.make (a_type, Current)
 						l_exception.raise
