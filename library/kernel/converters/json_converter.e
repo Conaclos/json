@@ -32,13 +32,16 @@ feature -- Conversion
 
 	from_json (j: attached like to_json): detachable ANY
 			-- Convert from JSON value.
-			-- Returns Void if unable to convert
+			--
+			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if a required converter is not registered.
 		require
 			j_attached: j /= Void
 		deferred end
 
-	to_json (o: attached like from_json): detachable JSON_VALUE
+	to_json (o: attached like from_json): JSON_VALUE
 			-- Convert to JSON value.
+			--
+			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if a required converter is not registered.
 		require
 			o_attached: o /= Void
 		deferred end

@@ -38,7 +38,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	value (an_object: detachable ANY): detachable JSON_VALUE
+	value (an_object: detachable ANY): JSON_VALUE
 			-- JSON value from Eiffel object.
 			--
 			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if no converter is registered for `an_object'.
@@ -88,6 +88,9 @@ feature -- Access
 				else
 					create {JSON_UNREGISTERED_CONVERTER_EXCEPTION} l_exception.make (an_object.generating_type, Current)
 					l_exception.raise
+
+					check has_not_exception: False then end
+						-- Exceptions are not already take in concern by Void-safety.
 				end
 			end
 		end
@@ -97,6 +100,8 @@ feature -- Access
 			-- object based on `a_type' will be returned.
 			--
 			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if no converter is registered for `a_type'.
+		note
+			raisable: "JSON_UNREGISTERED_CONVERTER_EXCEPTION"
 		local
 			l_exception: EXCEPTION
 		do
@@ -142,8 +147,9 @@ feature -- Access
 
 	object_from_json (a_json: STRING; a_type: detachable TYPE [detachable ANY]): detachable ANY
 			-- Eiffel object from JSON representation. If `a_type' /= Void an
-			-- Eiffel object based on `a_type' will be returned. Raises an
-			-- "eJSON exception" if unable to convert value.
+			-- Eiffel object based on `a_type' will be returned.
+			--
+			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if no converter is registered for `a_type'.
 		require
 			json_not_void: a_json /= Void
 		do

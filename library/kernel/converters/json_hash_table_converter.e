@@ -40,33 +40,23 @@ feature -- Conversion
 			end
 		end
 
-	to_json (o: attached like from_json): detachable JSON_OBJECT
+	to_json (o: attached like from_json): JSON_OBJECT
 			-- <Precursor>
 		local
 			js: JSON_STRING
+			l_value: JSON_VALUE
 		do
 			create Result
 			across
 				o as it
-			until
-				Result = Void
 			loop
-				if attached json.value (it.key) as l_value then
-					if attached {JSON_STRING} l_value as l_key then
-						js := l_key
-					else
-						create js.make_json (l_value.representation)
-					end
-					if attached json.value (it.item) as jv then
-						Result.put (jv, js)
-					else
-						Result := Void
-							-- Failed
-					end
+				l_value := json.value (it.key)
+				if attached {JSON_STRING} l_value as l_key then
+					js := l_key
 				else
-					Result := Void
-						-- Failed
+					create js.make_json (l_value.representation)
 				end
+				Result.put (json.value (it.item), js)
 			end
 		end
 

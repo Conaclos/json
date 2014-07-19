@@ -25,21 +25,14 @@ feature -- Conversion
 			end
 		end
 
-	to_json (o: like new_object): detachable JSON_ARRAY
+	to_json (o: like new_object): JSON_ARRAY
 			-- <Precursor>
 		do
 			create Result
             across
 				o as it
-            until
-                Result = Void
             loop
-                if attached json.value (it.item) as l_value then
-					Result.extend (l_value)
-                else
-			        Result := Void
-			            -- Failed
-                end
+                Result.extend (json.value (it.item))
             end
 		end
 
