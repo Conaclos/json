@@ -43,7 +43,6 @@ feature -- Access
 			--
 			-- Raises a {JSON_UNREGISTERED_CONVERTER_EXCEPTION} if no converter is registered for `an_object'.
 		local
-			ja: JSON_ARRAY
 			l_exception: EXCEPTION
 		do
 				-- Try to convert from basic Eiffel types. Note that we check with
