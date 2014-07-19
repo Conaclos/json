@@ -1,6 +1,6 @@
 note
 	description: "Json converter for {ARRAY}."
-	author: ""
+	author: "Victorien Elvinger"
 	date: "$Date$"
 	revision: "$Revision$"
 
