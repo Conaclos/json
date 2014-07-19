@@ -27,7 +27,7 @@ feature -- Conversion
 			create Result.make_from_special (l_area)
 		end
 
-	to_json (o: like from_json): detachable JSON_ARRAY
+	to_json (o: like from_json): JSON_ARRAY
 			-- <Precursor>
 		do
 			create Result
@@ -36,12 +36,7 @@ feature -- Conversion
 			until
 				Result = Void
 			loop
-				if attached json.value (it.item) as l_value then
-					Result.extend (l_value)
-				else
-					Result := Void
-						-- Failed
-				end
+				Result.extend (json.value (it.item))
 			end
 		end
 
